@@ -117,25 +117,25 @@ export default async function handler(req, res) {
     // Attachments from public/
     const attachments = [
       {
-        filename: "logo.png",
-        path: path.join(process.cwd(), "public", "logo.png"),
+        filename: "logo.svg",
+        path: path.join(process.cwd(), "assets", "images", "logo.svg"),
         cid: "logo",
       },
       {
-        filename: "github.png",
-        path: path.join(process.cwd(), "public", "github.png"),
+        filename: "github.svg",
+        path: path.join(process.cwd(), "assets", "images", "github.svg"),
         cid: "github",
       },
       {
-        filename: "linkedin.png",
-        path: path.join(process.cwd(), "public", "linkedin.png"),
+        filename: "linkedin.svg",
+        path: path.join(process.cwd(), "assets", "images", "linkedin.svg"),
         cid: "linkedin",
       },
       {
-        filename: "instagram.png",
-        path: path.join(process.cwd(), "public", "instagram.png"),
+        filename: "instagram.svg",
+        path: path.join(process.cwd(), "assets", "images", "instagram.svg"),
         cid: "instagram",
-      }
+      },
     ];
 
     // ===============================
@@ -161,7 +161,6 @@ export default async function handler(req, res) {
     });
 
     return res.status(200).json({ message: "Emails sent successfully" });
-
   } catch (error) {
     console.error("Zoho SMTP Error:", error.message);
     return res.status(500).json({ message: "Failed to send email" });
