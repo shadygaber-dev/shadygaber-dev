@@ -1,0 +1,97 @@
+// ============================================
+// MAIN JAVASCRIPT - Portfolio Website
+// ============================================
+
+// Import Components
+import { VideoSplashManager } from './components/videoSplash.js';
+import { ThemeManager } from './components/theme.js';
+import { ScrollManager } from './components/scroll.js';
+import { NavigationManager } from './components/navigation.js';
+import { AnimationManager } from './components/animations.js';
+import { ParticlesManager } from './components/particles.js';
+import { initLetterAnimation } from './components/letterAnimation.js';
+ 
+import { CookieConsent } from './components/cookieConsent.js';
+
+// Initialize Application
+class App {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        // Wait for DOM to be fully loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.start());
+        } else {
+            this.start();
+        }
+    }
+
+    start() {
+        // Initialize loading splash screen first
+        this.loadingSplash = new VideoSplashManager();
+        
+        // Initialize all managers
+        this.theme = new ThemeManager();
+        this.scroll = new ScrollManager();
+        this.navigation = new NavigationManager();
+        this.animation = new AnimationManager();
+        
+        // Initialize particles background for entire site
+        this.particles = new ParticlesManager();
+
+        // Initialize cookie consent popup
+        this.cookieConsent = new CookieConsent();
+
+        // Initialize letter animation for hero title
+        initLetterAnimation();
+
+        
+
+        // Initialize counter animations on homepage
+        if (document.querySelector('.stat-number')) {
+            this.initCounters();
+        }
+    }
+
+    // Counter Animation for Stats
+    initCounters() {
+        const counters = document.querySelectorAll('.stat-number');
+        const speed = 200; // Animation speed
+
+        const animateCounter = (counter) => {
+            const target = +counter.getAttribute('data-count');
+            const increment = target / speed;
+            let count = 0;
+
+            const updateCount = () => {
+                count += increment;
+                if (count < target) {
+                    counter.textContent = Math.ceil(count);
+                    requestAnimationFrame(updateCount);
+                } else {
+                    counter.textContent = target + '+';
+                }
+            };
+
+            updateCount();
+        };
+
+        // Intersection Observer for counters
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounter(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        counters.forEach(counter => observer.observe(counter));
+    }
+}
+
+// Start the application
+new App();
+
