@@ -13,16 +13,16 @@ export default async function handler(req, res) {
       port: 465,
       secure: true,
       auth: {
-        user: process.env.ZOHO_EMAIL,
-        pass: process.env.ZOHO_PASSWORD,
+        user: process.env.SMTP_USER, // ✨ عدلنا هنا
+        pass: process.env.SMTP_PASS, // ✨ وعدلنا هنا
       },
     });
 
     await transporter.sendMail({
-      from: `"${name}" <${process.env.ZOHO_EMAIL}>`,
-      to: process.env.ZOHO_EMAIL,
+      from: `"${name}" <${process.env.SMTP_USER}>`,
+      to: process.env.SMTP_USER,
       replyTo: email,
-      subject: subject,
+      subject,
       html: `
         <h2>New Contact Form Message</h2>
         <p><strong>Name:</strong> ${name}</p>
@@ -34,7 +34,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ message: "Email sent successfully" });
   } catch (error) {
-    console.error("Zoho SMTP Error:", error);
-    return res.status(500).json({ message: "Failed to send email", error });
+    console.error("Zoho SMTP Error:", error.message);
+    return res.status(500).json({ message: "Failed to send email" });
   }
 }
