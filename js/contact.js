@@ -10,7 +10,7 @@ class ContactManager {
     // EmailJS Configuration
     this.emailConfig = {
       serviceID: "service_lvxsfue",
-      templateID: "template_eyca4ek", // Replace with your EmailJS Template ID
+      templateID: "template_72grn2i", // Replace with your EmailJS Template ID
       publicKey: "VszWzsIXTU6ZOK5OV", // Replace with your EmailJS Public Key
     };
 
@@ -19,6 +19,11 @@ class ContactManager {
 
   init() {
     if (!this.form) return;
+
+    // Initialize EmailJS
+    if (typeof emailjs !== "undefined") {
+      emailjs.init(this.emailConfig.publicKey);
+    }
 
     this.form.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -38,7 +43,7 @@ class ContactManager {
     const formData = new FormData(this.form);
     const data = Object.fromEntries(formData);
 
-    // Validate all fields` 
+    // Validate all fields
     if (!this.validateForm()) {
       this.showMessage(
         "Please fill in all required fields correctly.",
@@ -50,16 +55,18 @@ class ContactManager {
     // Show loading state
     const submitButton = this.form.querySelector('button[type="submit"]');
     const originalText = submitButton.innerHTML;
-    
+    const originalHeight = submitButton.offsetHeight;
+    const originalWidth = submitButton.offsetWidth;
+
     submitButton.disabled = true;
     submitButton.style.minHeight = originalHeight + "px";
     submitButton.style.height = originalHeight + "px";
     submitButton.style.width = originalWidth + "px";
-    submitButton.textContent = "Sending...";
+    submitButton.innerHTML = "Sending...";
 
     try {
-      // Send form via Web3Forms
-      await this.submitForm(data);
+      // Send email via EmailJS
+      await this.sendEmail(data);
 
       // Success
       this.showMessage(
@@ -78,23 +85,28 @@ class ContactManager {
       // Reset button
       submitButton.disabled = false;
       submitButton.innerHTML = originalText;
+      submitButton.style.minHeight = "";
+      submitButton.style.height = "";
+      submitButton.style.width = "";
     }
   }
 
-  async submitForm(data) {
-    // Get access key from hidden input
-    const accessKeyInput = this.form.querySelector('input[name="access_key"]');
-    if (!accessKeyInput || !accessKeyInput.value) {
-      throw new Error("Web3Forms access key is missing");
+  async sendEmail(data) {
+    // Check if EmailJS is loaded
+    if (typeof emailjs === "undefined") {
+      throw new Error("EmailJS is not loaded");
     }
 
-    // Prepare form data for Web3Forms (using only required and standard fields)
-    const formData = new FormData();
-    formData.append("access_key", accessKeyInput.value);
-    formData.append("name", data.name || "");
-    formData.append("email", data.email || "");
-    formData.append("subject", data.subject || "");
-    formData.append("message", data.message || "");
+    // Prepare template parameters
+    const templateParams = {
+      from_name: data.name,
+      from_email: data.email,
+      reply_to: data.email,
+      to_email: "shadygaber.dev@gmail.com",
+      subject: data.subject,
+      message: data.message,
+      to_name: "Shady",
+    };
 
     try {
       // Send email using EmailJS
@@ -104,10 +116,9 @@ class ContactManager {
         templateParams
       );
 
-      console.log("Email sent successfully:", response);
       return response;
     } catch (error) {
-      console.error("Web3Forms Error:", error);
+      console.error("EmailJS Error:", error);
       throw error;
     }
   }
