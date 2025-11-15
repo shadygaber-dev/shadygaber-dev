@@ -153,30 +153,32 @@ Add your project screenshots:
 
 ## 🎯 Contact Form Setup
 
-The contact form is currently set up with a demo function. To make it work:
+The contact form is set up with Web3Forms. To configure it:
 
-### Option 1: Using EmailJS (Free)
+### Using Web3Forms (Free)
 
-1. Sign up at [EmailJS](https://www.emailjs.com/)
-2. Get your public key
-3. Update `js/contact.js`:
+1. Sign up at [Web3Forms](https://web3forms.com/)
+2. Get your access key
+3. Update `contact.html` and `js/contact.js` with your access key:
 
-```javascript
-async sendEmail(data) {
-    emailjs.init("YOUR_PUBLIC_KEY");
-    
-    return emailjs.send(
-        "YOUR_SERVICE_ID",
-        "YOUR_TEMPLATE_ID",
-        {
-            from_name: data.name,
-            from_email: data.email,
-            subject: data.subject,
-            message: data.message
-        }
-    );
-}
+In `contact.html`:
+```html
+<input type="hidden" name="access_key" value="YOUR_ACCESS_KEY">
 ```
+
+In `js/contact.js`:
+```javascript
+this.web3formsConfig = {
+    accessKey: "YOUR_ACCESS_KEY",
+    endpoint: "https://api.web3forms.com/submit"
+};
+```
+
+The form will automatically send emails to the email address associated with your Web3Forms account.
+
+### Alternative: Using Other Services
+
+If you prefer other services like Formspree or SendGrid, you'll need to modify the `sendEmail` method in `js/contact.js` to use their respective APIs.
 
 ### Option 2: Using Formspree (Free)
 

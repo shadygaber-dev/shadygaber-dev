@@ -1,30 +1,33 @@
 // ============================================
-// CONTACT PAGE - Form Handling
+// CONTACT PAGE - Form Handling with Web3Forms
 // ============================================
 
+/**
+ * Contact Manager
+ * Handles contact form submission and validation using Web3Forms
+ */
 class ContactManager {
   constructor() {
     this.form = document.getElementById("contactForm");
     this.formMessage = document.getElementById("formMessage");
 
-    // EmailJS Configuration
-    this.emailConfig = {
-      serviceID: "service_lvxsfue",
-      templateID: "template_72grn2i", // Replace with your EmailJS Template ID
-      publicKey: "VszWzsIXTU6ZOK5OV", // Replace with your EmailJS Public Key
+    // Web3Forms Configuration
+    this.web3formsConfig = {
+      accessKey: "ee846ef7-6f82-4505-b571-d00cc89ea215",
+      endpoint: "https://api.web3forms.com/submit"
     };
 
+    this.isSubmitting = false;
     this.init();
   }
 
+  /**
+   * Initialize the contact manager
+   */
   init() {
     if (!this.form) return;
 
-    // Initialize EmailJS
-    if (typeof emailjs !== "undefined") {
-      emailjs.init(this.emailConfig.publicKey);
-    }
-
+    // Handle form submission
     this.form.addEventListener("submit", (e) => {
       e.preventDefault();
       this.handleSubmit();
@@ -38,7 +41,15 @@ class ContactManager {
     });
   }
 
+  /**
+   * Handle form submission
+   */
   async handleSubmit() {
+    // Prevent multiple submissions
+    if (this.isSubmitting) {
+      return;
+    }
+
     // Get form data
     const formData = new FormData(this.form);
     const data = Object.fromEntries(formData);
@@ -52,8 +63,15 @@ class ContactManager {
       return;
     }
 
+    this.isSubmitting = true;
+
     // Show loading state
     const submitButton = this.form.querySelector('button[type="submit"]');
+    if (!submitButton) {
+      this.isSubmitting = false;
+      return;
+    }
+
     const originalText = submitButton.innerHTML;
     const originalHeight = submitButton.offsetHeight;
     const originalWidth = submitButton.offsetWidth;
@@ -65,7 +83,7 @@ class ContactManager {
     submitButton.innerHTML = "Sending...";
 
     try {
-      // Send email via EmailJS
+      // Send email via Web3Forms
       await this.sendEmail(data);
 
       // Success
@@ -74,6 +92,11 @@ class ContactManager {
         "success"
       );
       this.form.reset();
+      
+      // Clear any field errors
+      this.form.querySelectorAll('.field-error').forEach(error => {
+        error.remove();
+      });
     } catch (error) {
       // Error
       this.showMessage(
@@ -88,41 +111,57 @@ class ContactManager {
       submitButton.style.minHeight = "";
       submitButton.style.height = "";
       submitButton.style.width = "";
+      this.isSubmitting = false;
     }
   }
 
+  /**
+   * Send email via Web3Forms API
+   * @param {Object} data - Form data
+   */
   async sendEmail(data) {
-    // Check if EmailJS is loaded
-    if (typeof emailjs === "undefined") {
-      throw new Error("EmailJS is not loaded");
-    }
-
-    // Prepare template parameters
-    const templateParams = {
-      from_name: data.name,
-      from_email: data.email,
-      reply_to: data.email,
-      to_email: "shadygaber.dev@gmail.com",
-      subject: data.subject,
-      message: data.message,
-      to_name: "Shady",
-    };
+    // Prepare form data for Web3Forms
+    const formData = new FormData();
+    
+    // Add access key
+    formData.append('access_key', this.web3formsConfig.accessKey);
+    
+    // Add form fields
+    formData.append('name', data.name || '');
+    formData.append('email', data.email || '');
+    formData.append('subject', data.subject || 'New Contact Form Submission');
+    formData.append('message', data.message || '');
+    
+    // Add bot check (hidden field)
+    formData.append('botcheck', '');
+    
+    // Add from name for better email formatting
+    formData.append('from_name', data.name || 'Portfolio Visitor');
 
     try {
-      // Send email using EmailJS
-      const response = await emailjs.send(
-        this.emailConfig.serviceID,
-        this.emailConfig.templateID,
-        templateParams
-      );
+      // Send email using Web3Forms API
+      const response = await fetch(this.web3formsConfig.endpoint, {
+        method: 'POST',
+        body: formData
+      });
 
-      return response;
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Failed to send message');
+      }
+
+      return result;
     } catch (error) {
-      console.error("EmailJS Error:", error);
+      console.error("Web3Forms Error:", error);
       throw error;
     }
   }
 
+  /**
+   * Validate the entire form
+   * @returns {boolean} - True if form is valid
+   */
   validateForm() {
     const inputs = this.form.querySelectorAll(
       ".form-input[required], .form-textarea[required]"
@@ -138,7 +177,14 @@ class ContactManager {
     return isValid;
   }
 
+  /**
+   * Validate a single form field
+   * @param {HTMLElement} field - The field to validate
+   * @returns {boolean} - True if valid
+   */
   validateField(field) {
+    if (!field) return false;
+
     const value = field.value.trim();
     const type = field.type;
     let isValid = true;
@@ -159,10 +205,18 @@ class ContactManager {
     }
     // Validate minimum length
     else if (field.hasAttribute("minlength")) {
-      const minLength = parseInt(field.getAttribute("minlength"));
-      if (value.length < minLength) {
+      const minLength = parseInt(field.getAttribute("minlength"), 10);
+      if (!isNaN(minLength) && value.length < minLength) {
         isValid = false;
         errorMessage = `Minimum ${minLength} characters required`;
+      }
+    }
+    // Validate maximum length
+    else if (field.hasAttribute("maxlength")) {
+      const maxLength = parseInt(field.getAttribute("maxlength"), 10);
+      if (!isNaN(maxLength) && value.length > maxLength) {
+        isValid = false;
+        errorMessage = `Maximum ${maxLength} characters allowed`;
       }
     }
 
@@ -176,6 +230,11 @@ class ContactManager {
     return isValid;
   }
 
+  /**
+   * Show field error message
+   * @param {HTMLElement} field - The field with error
+   * @param {string} message - Error message
+   */
   showFieldError(field, message) {
     field.style.borderColor = "#ef4444";
 
@@ -196,6 +255,10 @@ class ContactManager {
     field.parentElement.appendChild(errorElement);
   }
 
+  /**
+   * Clear field error
+   * @param {HTMLElement} field - The field to clear
+   */
   clearFieldError(field) {
     field.style.borderColor = "";
     const errorElement = field.parentElement.querySelector(".field-error");
@@ -204,6 +267,11 @@ class ContactManager {
     }
   }
 
+  /**
+   * Show form message (success/error)
+   * @param {string} message - Message to display
+   * @param {string} type - Message type (success/error)
+   */
   showMessage(message, type) {
     if (!this.formMessage) return;
 

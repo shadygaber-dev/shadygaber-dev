@@ -10,15 +10,21 @@ import { NavigationManager } from './components/navigation.js';
 import { AnimationManager } from './components/animations.js';
 import { ParticlesManager } from './components/particles.js';
 import { initLetterAnimation } from './components/letterAnimation.js';
- 
 import { CookieConsent } from './components/cookieConsent.js';
 
-// Initialize Application
+/**
+ * Main Application Class
+ * Initializes and manages all components
+ */
 class App {
     constructor() {
+        this.managers = {};
         this.init();
     }
 
+    /**
+     * Initialize the application
+     */
     init() {
         // Wait for DOM to be fully loaded
         if (document.readyState === 'loading') {
@@ -28,40 +34,56 @@ class App {
         }
     }
 
+    /**
+     * Start the application and initialize all managers
+     */
     start() {
-        // Initialize loading splash screen first
-        this.loadingSplash = new VideoSplashManager();
-        
-        // Initialize all managers
-        this.theme = new ThemeManager();
-        this.scroll = new ScrollManager();
-        this.navigation = new NavigationManager();
-        this.animation = new AnimationManager();
-        
-        // Initialize particles background for entire site
-        this.particles = new ParticlesManager();
+        try {
+            // Initialize loading splash screen first
+            this.managers.loadingSplash = new VideoSplashManager();
+            
+            // Initialize all managers
+            this.managers.theme = new ThemeManager();
+            this.managers.scroll = new ScrollManager();
+            this.managers.navigation = new NavigationManager();
+            this.managers.animation = new AnimationManager();
+            
+            // Initialize particles background for entire site
+            this.managers.particles = new ParticlesManager();
 
-        // Initialize cookie consent popup
-        this.cookieConsent = new CookieConsent();
+            // Initialize cookie consent popup
+            this.managers.cookieConsent = new CookieConsent();
 
-        // Initialize letter animation for hero title
-        initLetterAnimation();
+            // Initialize letter animation for hero title
+            initLetterAnimation();
 
-        
-
-        // Initialize counter animations on homepage
-        if (document.querySelector('.stat-number')) {
-            this.initCounters();
+            // Initialize counter animations on homepage
+            if (document.querySelector('.stat-number')) {
+                this.initCounters();
+            }
+        } catch (error) {
+            console.error('Error initializing application:', error);
         }
     }
 
-    // Counter Animation for Stats
+    /**
+     * Counter Animation for Stats
+     * Animates number counters when they come into view
+     */
     initCounters() {
         const counters = document.querySelectorAll('.stat-number');
+        if (counters.length === 0) return;
+
         const speed = 200; // Animation speed
 
+        /**
+         * Animate a single counter
+         * @param {HTMLElement} counter - The counter element to animate
+         */
         const animateCounter = (counter) => {
-            const target = +counter.getAttribute('data-count');
+            const target = parseInt(counter.getAttribute('data-count'), 10) || 0;
+            if (target === 0) return;
+
             const increment = target / speed;
             let count = 0;
 
@@ -86,7 +108,10 @@ class App {
                     observer.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.5 });
+        }, { 
+            threshold: 0.5,
+            rootMargin: '0px'
+        });
 
         counters.forEach(counter => observer.observe(counter));
     }

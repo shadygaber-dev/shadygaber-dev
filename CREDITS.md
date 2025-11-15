@@ -120,7 +120,7 @@ All icons are custom-created inline SVG graphics:
 ## 📦 Optional Integrations (Ready to Use)
 
 ### Email Services
-- **EmailJS** - https://www.emailjs.com/ (Free tier available)
+- **Web3Forms** - https://web3forms.com/ (Currently used - Free tier available)
 - **Formspree** - https://formspree.io/ (Easy form handling)
 - **SendGrid** - https://sendgrid.com/ (Enterprise solution)
 

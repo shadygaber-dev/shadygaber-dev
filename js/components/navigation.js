@@ -21,6 +21,9 @@ export class NavigationManager {
       this.navToggle.addEventListener("click", () => this.toggleMenu());
     }
 
+    // Initialize close button
+    this.initCloseButton();
+
     // Close menu when clicking on links
     this.navLinks.forEach((link) => {
       link.addEventListener("click", () => {
@@ -34,8 +37,11 @@ export class NavigationManager {
     document.addEventListener("click", (e) => {
       if (
         this.isOpen &&
+        this.navMenu &&
+        this.navToggle &&
         !this.navMenu.contains(e.target) &&
-        !this.navToggle.contains(e.target)
+        !this.navToggle.contains(e.target) &&
+        (!this.navClose || !this.navClose.contains(e.target))
       ) {
         this.closeMenu();
       }
@@ -53,6 +59,9 @@ export class NavigationManager {
     window.addEventListener("scroll", () => this.updateActiveLink(), {
       passive: true,
     });
+
+    // Highlight current page on load
+    this.highlightCurrentPage();
   }
 
   toggleMenu() {
@@ -65,26 +74,50 @@ export class NavigationManager {
 
   openMenu() {
     this.isOpen = true;
-    this.navMenu.classList.add("active");
-    this.navToggle.classList.add("active");
-    this.body.style.overflow = "hidden";
+    if (this.navMenu) {
+      this.navMenu.classList.add("active");
+    }
+    if (this.navToggle) {
+      this.navToggle.classList.add("active");
+    }
+    if (this.body) {
+      this.body.style.overflow = "hidden";
+    }
 
     // Add aria attributes for accessibility
-    this.navToggle.setAttribute("aria-expanded", "true");
-    this.navMenu.setAttribute("aria-hidden", "false");
-    this.navClose.style.display = "block";
+    if (this.navToggle) {
+      this.navToggle.setAttribute("aria-expanded", "true");
+    }
+    if (this.navMenu) {
+      this.navMenu.setAttribute("aria-hidden", "false");
+    }
+    if (this.navClose) {
+      this.navClose.style.display = "block";
+    }
   }
 
   closeMenu() {
     this.isOpen = false;
-    this.navMenu.classList.remove("active");
-    this.navToggle.classList.remove("active");
-    this.body.style.overflow = "";
-    this.navClose.style.display = "none";
+    if (this.navMenu) {
+      this.navMenu.classList.remove("active");
+    }
+    if (this.navToggle) {
+      this.navToggle.classList.remove("active");
+    }
+    if (this.body) {
+      this.body.style.overflow = "";
+    }
+    if (this.navClose) {
+      this.navClose.style.display = "none";
+    }
 
     // Update aria attributes
-    this.navToggle.setAttribute("aria-expanded", "false");
-    this.navMenu.setAttribute("aria-hidden", "true");
+    if (this.navToggle) {
+      this.navToggle.setAttribute("aria-expanded", "false");
+    }
+    if (this.navMenu) {
+      this.navMenu.setAttribute("aria-hidden", "true");
+    }
   }
 
   updateActiveLink() {
@@ -126,9 +159,16 @@ export class NavigationManager {
 
     this.navLinks.forEach((link) => {
       const linkPage = link.getAttribute("href");
-      if (linkPage === currentPage) {
+      if (linkPage === currentPage || (currentPage === "" && linkPage === "index.html")) {
         link.classList.add("active");
       }
     });
+  }
+
+  // Close menu when clicking close button
+  initCloseButton() {
+    if (this.navClose) {
+      this.navClose.addEventListener("click", () => this.closeMenu());
+    }
   }
 }

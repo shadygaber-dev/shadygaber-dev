@@ -849,6 +849,13 @@
   transition: all 0.3s ease;
 }
 
+/* Hidden utility class */
+.hidden {
+  display: none !important;
+  visibility: hidden;
+  opacity: 0;
+}
+
 .form-message.success,
 .form-message.error {
   display: block !important;

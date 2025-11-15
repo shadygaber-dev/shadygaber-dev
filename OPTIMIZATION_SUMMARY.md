@@ -158,7 +158,7 @@ Already in your portfolio:
 ## 7. 📧 **Contact Form** (Already Implemented)
 
 ```
-✅ EmailJS integration configured
+✅ Web3Forms integration configured
 ✅ Form validation
 ✅ Success/error messages
 ✅ Professional styling
