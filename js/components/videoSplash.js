@@ -27,29 +27,29 @@ export class VideoSplashManager {
         // Prevent scrolling while splash is showing
         document.body.style.overflow = 'hidden';
         
-        // Hide splash after 3 seconds
+        // Hide splash after 2 seconds
         setTimeout(() => {
             this.hideSplash();
-        }, 1500);
+        }, 2000);
     }
 
     hideSplash() {
-        // Hide splash with fade out
+        // Start both animations simultaneously for smooth transition
+        // Hide splash and show content at the same time
         this.loadingSplash.classList.add('hidden');
+        this.mainContent.classList.add('visible');
         
-        // Show main content with fade in
+        // Re-enable scrolling after a short delay to allow transition
         setTimeout(() => {
-            this.mainContent.classList.add('visible');
-            // Re-enable scrolling
             document.body.style.overflow = '';
             // Scroll to top
             window.scrollTo({
                 top: 0,
                 behavior: 'instant'
             });
-        }, 150);
+        }, 100);
 
-        // Remove splash from DOM after transition
+        // Remove splash from DOM after transition completes
         setTimeout(() => {
             if (this.loadingSplash && this.loadingSplash.parentNode) {
                 this.loadingSplash.remove();

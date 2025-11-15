@@ -121,11 +121,9 @@ export class NavigationManager {
   }
 
   updateActiveLink() {
-    // Don't update if we're on internal pages (not home)
-    if (
-      !window.location.pathname.endsWith("index.html") &&
-      window.location.pathname !== "/"
-    ) {
+    // Only update active links on home page (index)
+    const currentPath = window.location.pathname;
+    if (currentPath !== "/" && currentPath !== "/index.html" && currentPath !== "index.html") {
       return;
     }
 
@@ -154,12 +152,15 @@ export class NavigationManager {
 
   // Highlight current page in navigation
   highlightCurrentPage() {
-    const currentPage =
-      window.location.pathname.split("/").pop() || "index.html";
+    const currentPath = window.location.pathname;
+    const currentPage = currentPath === "/" ? "/" : currentPath;
 
     this.navLinks.forEach((link) => {
       const linkPage = link.getAttribute("href");
-      if (linkPage === currentPage || (currentPage === "" && linkPage === "index.html")) {
+      // Match exact path or handle index page
+      if (linkPage === currentPage || 
+          (currentPage === "/" && (linkPage === "/" || linkPage === "/index.html" || linkPage === "index.html")) ||
+          (currentPage === "" && (linkPage === "/" || linkPage === "index.html"))) {
         link.classList.add("active");
       }
     });

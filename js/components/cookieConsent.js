@@ -89,7 +89,7 @@ export class CookieConsent {
           <button id="cookieRejectNonEssential" class="cookie-btn cookie-btn-secondary" aria-label="Reject non-essential cookies">
             Reject Non-Essential
           </button>
-          <a href="cookies-policy.html" class="cookie-btn cookie-btn-link" aria-label="Learn more about our cookies policy">
+          <a href="/cookies-policy" class="cookie-btn cookie-btn-link" aria-label="Learn more about our cookies policy">
             Learn More
           </a>
         </div>

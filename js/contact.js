@@ -1,24 +1,55 @@
 // ============================================
-// CONTACT PAGE - Form Handling with Web3Forms
+// CONTACT PAGE - Form Handling with EmailJS
 // ============================================
 
 /**
  * Contact Manager
- * Handles contact form submission and validation using Web3Forms
+ * Handles contact form submission and validation using EmailJS
  */
 class ContactManager {
   constructor() {
     this.form = document.getElementById("contactForm");
     this.formMessage = document.getElementById("formMessage");
 
-    // Web3Forms Configuration
-    this.web3formsConfig = {
-      accessKey: "ee846ef7-6f82-4505-b571-d00cc89ea215",
-      endpoint: "https://api.web3forms.com/submit"
+    // EmailJS Configuration
+    this.emailConfig = {
+      serviceID: "service_lvxsfue",
+      templateID: "template_eyca4ek",
+      publicKey: "VszWzsIXTU6ZOK5OV",
     };
 
     this.isSubmitting = false;
     this.init();
+  }
+
+  /**
+   * Wait for EmailJS SDK to load
+   * @returns {Promise} - Resolves when EmailJS is loaded
+   */
+  waitForEmailJS() {
+    return new Promise((resolve, reject) => {
+      // Check if already loaded
+      if (typeof emailjs !== "undefined") {
+        resolve();
+        return;
+      }
+
+      // Wait for script to load (max 10 seconds)
+      let attempts = 0;
+      const maxAttempts = 100; // 10 seconds (100 * 100ms)
+      
+      const checkInterval = setInterval(() => {
+        attempts++;
+        
+        if (typeof emailjs !== "undefined") {
+          clearInterval(checkInterval);
+          resolve();
+        } else if (attempts >= maxAttempts) {
+          clearInterval(checkInterval);
+          reject(new Error("EmailJS loading timeout"));
+        }
+      }, 100);
+    });
   }
 
   /**
@@ -27,10 +58,21 @@ class ContactManager {
   init() {
     if (!this.form) return;
 
-    // Handle form submission
-    this.form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      this.handleSubmit();
+    // Wait for EmailJS to load, then initialize
+    this.waitForEmailJS().then(() => {
+      // Initialize EmailJS
+      if (typeof emailjs !== "undefined") {
+        emailjs.init(this.emailConfig.publicKey);
+      }
+
+      // Handle form submission
+      this.form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        this.handleSubmit();
+      });
+    }).catch(() => {
+      console.error("EmailJS failed to load");
+      this.showMessage("Email service is not available. Please try again later.", "error");
     });
 
     // Add input validation
@@ -83,7 +125,7 @@ class ContactManager {
     submitButton.innerHTML = "Sending...";
 
     try {
-      // Send email via Web3Forms
+      // Send email via EmailJS
       await this.sendEmail(data);
 
       // Success
@@ -116,44 +158,37 @@ class ContactManager {
   }
 
   /**
-   * Send email via Web3Forms API
+   * Send email via EmailJS API
    * @param {Object} data - Form data
    */
   async sendEmail(data) {
-    // Prepare form data for Web3Forms
-    const formData = new FormData();
-    
-    // Add access key
-    formData.append('access_key', this.web3formsConfig.accessKey);
-    
-    // Add form fields
-    formData.append('name', data.name || '');
-    formData.append('email', data.email || '');
-    formData.append('subject', data.subject || 'New Contact Form Submission');
-    formData.append('message', data.message || '');
-    
-    // Add bot check (hidden field)
-    formData.append('botcheck', '');
-    
-    // Add from name for better email formatting
-    formData.append('from_name', data.name || 'Portfolio Visitor');
+    // Check if EmailJS is loaded
+    if (typeof emailjs === "undefined") {
+      throw new Error("EmailJS is not loaded");
+    }
+
+    // Prepare template parameters
+    const templateParams = {
+      from_name: data.name,
+      from_email: data.email,
+      reply_to: data.email,
+      to_email: "shadygaber.dev@gmail.com",
+      subject: data.subject,
+      message: data.message,
+      to_name: "Shady",
+    };
 
     try {
-      // Send email using Web3Forms API
-      const response = await fetch(this.web3formsConfig.endpoint, {
-        method: 'POST',
-        body: formData
-      });
+      // Send email using EmailJS
+      const response = await emailjs.send(
+        this.emailConfig.serviceID,
+        this.emailConfig.templateID,
+        templateParams
+      );
 
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || 'Failed to send message');
-      }
-
-      return result;
+      return response;
     } catch (error) {
-      console.error("Web3Forms Error:", error);
+      console.error("EmailJS Error:", error);
       throw error;
     }
   }
