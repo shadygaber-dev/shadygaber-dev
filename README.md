@@ -99,7 +99,6 @@ portfolio/
 - Location information
 
 ## 🛠️ Technologies Used
-
 ### Frontend
 - **HTML5** - Semantic markup
 - **CSS3** - Modern styling with custom properties
