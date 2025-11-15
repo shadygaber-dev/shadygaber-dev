@@ -22,15 +22,15 @@
   "author": {
     "name": "Shady Gaber",
     "email": "shadygaber.dev@gmail.com",
-    "url": "https://shady.dev"
+    "url": "https://shadygaber.dev"
   },
   "license": "MIT",
   "homepage": "https://shady.dev",
-  "devDependencies": {},
-  "dependencies": {},
+  "dependencies": {
+    "nodemailer": "^7.0.10"
+  },
   "engines": {
     "node": ">=14.0.0",
     "npm": ">=6.0.0"
   }
 }
-
