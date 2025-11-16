@@ -117,23 +117,23 @@ export default async function handler(req, res) {
     // Attachments from public/
     const attachments = [
       {
-        filename: "logo.svg",
-        path: path.join(process.cwd(), "assets", "images", "logo.svg"),
+        filename: "logo.png",
+        path: path.join(process.cwd(), "assets", "images", "logo.png"),
         cid: "logo",
       },
       {
-        filename: "github.svg",
-        path: path.join(process.cwd(), "assets", "images", "github.svg"),
+        filename: "github.png",
+        path: path.join(process.cwd(), "assets", "images", "github.png"),
         cid: "github",
       },
       {
-        filename: "linkedin.svg",
-        path: path.join(process.cwd(), "assets", "images", "linkedin.svg"),
+        filename: "linkedin.png",
+        path: path.join(process.cwd(), "assets", "images", "linkedin.png"),
         cid: "linkedin",
       },
       {
-        filename: "instagram.svg",
-        path: path.join(process.cwd(), "assets", "images", "instagram.svg"),
+        filename: "instagram.png",
+        path: path.join(process.cwd(), "assets", "images", "instagram.png"),
         cid: "instagram",
       },
     ];
