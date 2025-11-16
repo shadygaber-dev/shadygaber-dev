@@ -11,7 +11,7 @@ function adminTemplate({ name, email, subject, message }) {
       
       <div style="text-align:center; margin-bottom:20px;">
         <a href="https://shadygaber.dev">
-          <img src="https://shadygaber.dev/images/logo.png" alt="Shady Gaber Logo" style="width:120px;">
+          <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276340/logo_v4pwlo.svg" alt="Shady Gaber Logo" style="width:120px;">
         </a>
       </div>
 
@@ -32,14 +32,14 @@ function adminTemplate({ name, email, subject, message }) {
         <p style="font-size:13px; color:#777;">Sent from shadygaber.dev</p>
 
         <div style="margin-top:20px;">
-          <a href="https://github.com/shadygaber" target="_blank">
-            <img src="https://shadygaber.dev/images/github.png" width="22" style="margin-right:10px;">
+          <a href="https://github.com/shadygaber" target="_blank" style="text-decoration:none; margin:0 10px;">
+            <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276339/github_ntaeiu.svg" width="24" alt="GitHub">
           </a>
-          <a href="https://linkedin.com/in/shadygaber" target="_blank">
-            <img src="https://shadygaber.dev/images/linkedin.png" width="22" style="margin-right:10px;">
+          <a href="https://linkedin.com/in/shadygaber" target="_blank" style="text-decoration:none; margin:0 10px;">
+            <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276339/linkedin_emvxyx.svg" width="24" alt="LinkedIn">
           </a>
-          <a href="https://instagram.com/shadygaber" target="_blank">
-            <img src="https://shadygaber.dev/images/instagram.png" width="22">
+          <a href="https://instagram.com/shadygaber" target="_blank" style="text-decoration:none; margin:0 10px;">
+            <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276339/instagram_s8qff1.svg" width="24" alt="Instagram">
           </a>
         </div>
       </div>
@@ -60,7 +60,7 @@ function autoReplyTemplate({ name, subject, message }) {
       
       <div style="text-align:center; margin-bottom:20px;">
         <a href="https://shadygaber.dev">
-          <img src="https://shadygaber.dev/images/logo.png" alt="Logo" style="width:120px;">
+          <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276340/logo_v4pwlo.svg" alt="Logo" style="width:120px;">
         </a>
       </div>
 
@@ -86,14 +86,14 @@ function autoReplyTemplate({ name, subject, message }) {
         </a>
 
         <div style="margin-top:20px;">
-          <a href="https://github.com/shadygaber" target="_blank">
-            <img src="https://shadygaber.dev/images/github.png" width="22" style="margin-right:10px;">
+          <a href="https://github.com/shadygaber" target="_blank" style="text-decoration:none; margin:0 10px;">
+            <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276339/github_ntaeiu.svg" width="24" alt="GitHub">
           </a>
-          <a href="https://linkedin.com/in/shadygaber" target="_blank">
-            <img src="https://shadygaber.dev/images/linkedin.png" width="22" style="margin-right:10px;">
+          <a href="https://linkedin.com/in/shadygaber" target="_blank" style="text-decoration:none; margin:0 10px;">
+            <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276339/linkedin_emvxyx.svg" width="24" alt="LinkedIn">
           </a>
-          <a href="https://instagram.com/shadygaber" target="_blank">
-            <img src="https://shadygaber.dev/images/instagram.png" width="22">
+          <a href="https://instagram.com/shadygaber" target="_blank" style="text-decoration:none; margin:0 10px;">
+            <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276339/instagram_s8qff1.svg" width="24" alt="Instagram">
           </a>
         </div>
       </div>
