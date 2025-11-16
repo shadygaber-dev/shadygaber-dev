@@ -33,9 +33,15 @@ function adminTemplate({ name, email, subject, message }) {
         <p style="font-size:13px; color:#777;">Sent from shadygaber.dev</p>
 
         <div style="margin-top:20px;">
-          <img src="cid:github" width="22" style="margin-right:10px;">
-          <img src="cid:linkedin" width="22" style="margin-right:10px;">
-          <img src="cid:instagram" width="22">
+          <a href="https://github.com/shadygaber" target="_blank" style="text-decoration:none; display:inline-block; margin:0 8px;">
+            <img src="cid:github" width="24" height="24" alt="GitHub" style="display:block;">
+          </a>
+          <a href="https://linkedin.com/in/shadygaber" target="_blank" style="text-decoration:none; display:inline-block; margin:0 8px;">
+            <img src="cid:linkedin" width="24" height="24" alt="LinkedIn" style="display:block;">
+          </a>
+          <a href="https://instagram.com/shadygaber" target="_blank" style="text-decoration:none; display:inline-block; margin:0 8px;">
+            <img src="cid:instagram" width="24" height="24" alt="Instagram" style="display:block;">
+          </a>
         </div>
       </div>
 
@@ -48,7 +54,7 @@ function adminTemplate({ name, email, subject, message }) {
 //  AUTO-REPLY TEMPLATE
 // ===============================
 
-function autoReplyTemplate({ name, message }) {
+function autoReplyTemplate({ name, subject, message }) {
   return `
   <div style="font-family:Arial, sans-serif; background:#f5f5f5; padding:25px;">
     <div style="max-width:600px; margin:auto; background:#fff; padding:25px; border-radius:12px; border:1px solid #eee;">
@@ -63,7 +69,7 @@ function autoReplyTemplate({ name, message }) {
 
       <p style="font-size:15px;">
         Hello ${name},<br><br>
-        Thank you for your message — I have received it successfully.
+        Thank you for your message regarding "<strong>${subject}</strong>" — I have received it successfully.
         I will get back to you as soon as possible.
       </p>
 
@@ -81,9 +87,15 @@ function autoReplyTemplate({ name, message }) {
         </a>
 
         <div style="margin-top:20px;">
-          <img src="cid:github" width="22" style="margin-right:10px;">
-          <img src="cid:linkedin" width="22" style="margin-right:10px;">
-          <img src="cid:instagram" width="22">
+          <a href="https://github.com/shadygaber" target="_blank" style="text-decoration:none; display:inline-block; margin:0 8px;">
+            <img src="cid:github" width="24" height="24" alt="GitHub" style="display:block;">
+          </a>
+          <a href="https://linkedin.com/in/shadygaber" target="_blank" style="text-decoration:none; display:inline-block; margin:0 8px;">
+            <img src="cid:linkedin" width="24" height="24" alt="LinkedIn" style="display:block;">
+          </a>
+          <a href="https://instagram.com/shadygaber" target="_blank" style="text-decoration:none; display:inline-block; margin:0 8px;">
+            <img src="cid:instagram" width="24" height="24" alt="Instagram" style="display:block;">
+          </a>
         </div>
       </div>
 
@@ -103,6 +115,17 @@ export default async function handler(req, res) {
 
   const { name, email, subject, message } = req.body;
 
+  // Validate required fields
+  if (!name || !email || !subject || !message) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: "Invalid email format" });
+  }
+
   try {
     const transporter = nodemailer.createTransport({
       host: "smtp.zoho.com",
@@ -114,7 +137,7 @@ export default async function handler(req, res) {
       },
     });
 
-    // Attachments from public/
+    // Attachments from assets/images/
     const attachments = [
       {
         filename: "logo.png",
@@ -163,6 +186,8 @@ export default async function handler(req, res) {
     return res.status(200).json({ message: "Emails sent successfully" });
   } catch (error) {
     console.error("Zoho SMTP Error:", error.message);
-    return res.status(500).json({ message: "Failed to send email" });
+    return res
+      .status(500)
+      .json({ message: "Failed to send email", error: error.message });
   }
 }
