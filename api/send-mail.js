@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import path from "path";
 
 // ===============================
 //  ADMIN EMAIL TEMPLATE
@@ -11,7 +12,7 @@ function adminTemplate({ name, email, subject, message }) {
       
       <div style="text-align:center; margin-bottom:20px;">
         <a href="https://shadygaber.dev">
-          <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276340/logo_v4pwlo.svg" alt="Shady Gaber Logo" style="width:120px;">
+          <img src="cid:logo" alt="Shady Gaber Logo" style="width:120px;">
         </a>
       </div>
 
@@ -32,15 +33,9 @@ function adminTemplate({ name, email, subject, message }) {
         <p style="font-size:13px; color:#777;">Sent from shadygaber.dev</p>
 
         <div style="margin-top:20px;">
-          <a href="https://github.com/shadygaber" target="_blank" style="text-decoration:none; margin:0 10px;">
-            <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276339/github_ntaeiu.svg" width="24" alt="GitHub">
-          </a>
-          <a href="https://linkedin.com/in/shadygaber" target="_blank" style="text-decoration:none; margin:0 10px;">
-            <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276339/linkedin_emvxyx.svg" width="24" alt="LinkedIn">
-          </a>
-          <a href="https://instagram.com/shadygaber" target="_blank" style="text-decoration:none; margin:0 10px;">
-            <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276339/instagram_s8qff1.svg" width="24" alt="Instagram">
-          </a>
+          <img src="cid:github" width="22" style="margin-right:10px;">
+          <img src="cid:linkedin" width="22" style="margin-right:10px;">
+          <img src="cid:instagram" width="22">
         </div>
       </div>
 
@@ -53,14 +48,14 @@ function adminTemplate({ name, email, subject, message }) {
 //  AUTO-REPLY TEMPLATE
 // ===============================
 
-function autoReplyTemplate({ name, subject, message }) {
+function autoReplyTemplate({ name, message }) {
   return `
   <div style="font-family:Arial, sans-serif; background:#f5f5f5; padding:25px;">
     <div style="max-width:600px; margin:auto; background:#fff; padding:25px; border-radius:12px; border:1px solid #eee;">
       
       <div style="text-align:center; margin-bottom:20px;">
         <a href="https://shadygaber.dev">
-          <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276340/logo_v4pwlo.svg" alt="Logo" style="width:120px;">
+          <img src="cid:logo" alt="Logo" style="width:120px;">
         </a>
       </div>
 
@@ -68,7 +63,7 @@ function autoReplyTemplate({ name, subject, message }) {
 
       <p style="font-size:15px;">
         Hello ${name},<br><br>
-        Thank you for your message regarding "<strong>${subject}</strong>" — I have received it successfully.
+        Thank you for your message — I have received it successfully.
         I will get back to you as soon as possible.
       </p>
 
@@ -86,15 +81,9 @@ function autoReplyTemplate({ name, subject, message }) {
         </a>
 
         <div style="margin-top:20px;">
-          <a href="https://github.com/shadygaber" target="_blank" style="text-decoration:none; margin:0 10px;">
-            <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276339/github_ntaeiu.svg" width="24" alt="GitHub">
-          </a>
-          <a href="https://linkedin.com/in/shadygaber" target="_blank" style="text-decoration:none; margin:0 10px;">
-            <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276339/linkedin_emvxyx.svg" width="24" alt="LinkedIn">
-          </a>
-          <a href="https://instagram.com/shadygaber" target="_blank" style="text-decoration:none; margin:0 10px;">
-            <img src="https://res.cloudinary.com/dskeowazl/image/upload/v1763276339/instagram_s8qff1.svg" width="24" alt="Instagram">
-          </a>
+          <img src="cid:github" width="22" style="margin-right:10px;">
+          <img src="cid:linkedin" width="22" style="margin-right:10px;">
+          <img src="cid:instagram" width="22">
         </div>
       </div>
 
@@ -114,17 +103,6 @@ export default async function handler(req, res) {
 
   const { name, email, subject, message } = req.body;
 
-  // Validate required fields
-  if (!name || !email || !subject || !message) {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
-
-  // Validate email format
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({ message: "Invalid email format" });
-  }
-
   try {
     const transporter = nodemailer.createTransport({
       host: "smtp.zoho.com",
@@ -136,6 +114,30 @@ export default async function handler(req, res) {
       },
     });
 
+    // Attachments from public/
+    const attachments = [
+      {
+        filename: "logo.svg",
+        path: path.join(process.cwd(), "assets", "images", "logo.svg"),
+        cid: "logo",
+      },
+      {
+        filename: "github.svg",
+        path: path.join(process.cwd(), "assets", "images", "github.svg"),
+        cid: "github",
+      },
+      {
+        filename: "linkedin.svg",
+        path: path.join(process.cwd(), "assets", "images", "linkedin.svg"),
+        cid: "linkedin",
+      },
+      {
+        filename: "instagram.svg",
+        path: path.join(process.cwd(), "assets", "images", "instagram.svg"),
+        cid: "instagram",
+      },
+    ];
+
     // ===============================
     //  SEND EMAIL TO YOU
     // ===============================
@@ -144,6 +146,7 @@ export default async function handler(req, res) {
       to: process.env.SMTP_USER,
       subject: `New Message from ${name}`,
       html: adminTemplate({ name, email, subject, message }),
+      attachments,
     });
 
     // ===============================
@@ -154,13 +157,12 @@ export default async function handler(req, res) {
       to: email,
       subject: "Thanks for contacting me!",
       html: autoReplyTemplate({ name, subject, message }),
+      attachments,
     });
 
     return res.status(200).json({ message: "Emails sent successfully" });
   } catch (error) {
     console.error("Zoho SMTP Error:", error.message);
-    return res
-      .status(500)
-      .json({ message: "Failed to send email", error: error.message });
+    return res.status(500).json({ message: "Failed to send email" });
   }
 }
