@@ -1,18 +1,10 @@
 import nodemailer from "nodemailer";
-
-// ===============================
-//  CLOUDINARY IMAGE LINKS
-// ===============================
-const IMAGES = {
-  logo: "https://res.cloudinary.com/dskeowazl/image/upload/v1763276340/logo_v4pwlo.svg",
-  github: "https://res.cloudinary.com/dskeowazl/image/upload/v1763276339/github_ntaeiu.svg",
-  linkedin: "https://res.cloudinary.com/dskeowazl/image/upload/v1763276339/linkedin_emvxyx.svg",
-  instagram: "https://res.cloudinary.com/dskeowazl/image/upload/v1763276339/instagram_s8qff1.svg",
-};
+import path from "path";
 
 // ===============================
 //  ADMIN EMAIL TEMPLATE
 // ===============================
+
 function adminTemplate({ name, email, subject, message }) {
   return `
   <div style="font-family:Arial, sans-serif; background:#f5f5f5; padding:25px;">
@@ -20,7 +12,7 @@ function adminTemplate({ name, email, subject, message }) {
       
       <div style="text-align:center; margin-bottom:20px;">
         <a href="https://shadygaber.dev">
-          <img src="${IMAGES.logo}" alt="Shady Gaber Logo" style="width:120px;">
+          <img src="cid:logo" alt="Shady Gaber Logo" style="width:120px;">
         </a>
       </div>
 
@@ -41,9 +33,9 @@ function adminTemplate({ name, email, subject, message }) {
         <p style="font-size:13px; color:#777;">Sent from shadygaber.dev</p>
 
         <div style="margin-top:20px;">
-          <a href="https://github.com/shadygaber-dev"><img src="${IMAGES.github}" width="22" style="margin-right:10px;"></a>
-          <a href="https://www.linkedin.com/in/shadygaber-dev/"><img src="${IMAGES.linkedin}" width="22" style="margin-right:10px;"></a>
-          <a href="https://www.instagram.com/shadygaber.dev/"><img src="${IMAGES.instagram}" width="22"></a>
+          <img src="cid:github" width="22" style="margin-right:10px;">
+          <img src="cid:linkedin" width="22" style="margin-right:10px;">
+          <img src="cid:instagram" width="22">
         </div>
       </div>
 
@@ -55,14 +47,15 @@ function adminTemplate({ name, email, subject, message }) {
 // ===============================
 //  AUTO-REPLY TEMPLATE
 // ===============================
+
 function autoReplyTemplate({ name, message }) {
   return `
   <div style="font-family:Arial, sans-serif; background:#f5f5f5; padding:25px;">
-    <div style="max-width:600px; margin:auto; background:#fff; padding:25px; border-radius:12px; border:1px solid:#eee;">
+    <div style="max-width:600px; margin:auto; background:#fff; padding:25px; border-radius:12px; border:1px solid #eee;">
       
       <div style="text-align:center; margin-bottom:20px;">
         <a href="https://shadygaber.dev">
-          <img src="${IMAGES.logo}" alt="Logo" style="width:120px;">
+          <img src="cid:logo" alt="Logo" style="width:120px;">
         </a>
       </div>
 
@@ -88,9 +81,9 @@ function autoReplyTemplate({ name, message }) {
         </a>
 
         <div style="margin-top:20px;">
-          <a href="https://github.com/shadygaber-dev"><img src="${IMAGES.github}" width="22" style="margin-right:10px;"></a>
-          <a href="https://www.linkedin.com/in/shadygaber-dev/"><img src="${IMAGES.linkedin}" width="22" style="margin-right:10px;"></a>
-          <a href="https://www.instagram.com/shadygaber.dev/"><img src="${IMAGES.instagram}" width="22"></a>
+          <img src="cid:github" width="22" style="margin-right:10px;">
+          <img src="cid:linkedin" width="22" style="margin-right:10px;">
+          <img src="cid:instagram" width="22">
         </div>
       </div>
 
@@ -102,6 +95,7 @@ function autoReplyTemplate({ name, message }) {
 // ===============================
 //  MAIN API HANDLER
 // ===============================
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method Not Allowed" });
@@ -120,24 +114,50 @@ export default async function handler(req, res) {
       },
     });
 
+    // Attachments from public/
+    const attachments = [
+      {
+        filename: "logo.png",
+        path: path.join(process.cwd(), "assets", "images", "logo.png"),
+        cid: "logo",
+      },
+      {
+        filename: "github.png",
+        path: path.join(process.cwd(), "assets", "images", "github.png"),
+        cid: "github",
+      },
+      {
+        filename: "linkedin.png",
+        path: path.join(process.cwd(), "assets", "images", "linkedin.png"),
+        cid: "linkedin",
+      },
+      {
+        filename: "instagram.png",
+        path: path.join(process.cwd(), "assets", "images", "instagram.png"),
+        cid: "instagram",
+      },
+    ];
+
     // ===============================
     //  SEND EMAIL TO YOU
     // ===============================
     await transporter.sendMail({
-      from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
+      from: `Portfolio Contact <${process.env.SMTP_USER}>`,
       to: process.env.SMTP_USER,
       subject: `New Message from ${name}`,
       html: adminTemplate({ name, email, subject, message }),
+      attachments,
     });
 
     // ===============================
     //  AUTO-REPLY EMAIL
     // ===============================
     await transporter.sendMail({
-      from: `"Shady Gaber" <${process.env.SMTP_USER}>`,
+      from: `Shady Gaber <${process.env.SMTP_USER}>`,
       to: email,
       subject: "Thanks for contacting me!",
-      html: autoReplyTemplate({ name, message }),
+      html: autoReplyTemplate({ name, subject, message }),
+      attachments,
     });
 
     return res.status(200).json({ message: "Emails sent successfully" });
