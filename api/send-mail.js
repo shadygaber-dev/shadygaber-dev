@@ -140,13 +140,13 @@ export default async function handler(req, res) {
     // Attachments from assets/images/
     const attachments = [
       {
-        filename: "logo.png",
+        filename: "emaillogo.png",
         path: path.join(
           process.cwd(),
           "public",
           "assets",
           "images",
-          "logo.png"
+          "emaillogo.png"
         ),
         cid: "logo",
       },
